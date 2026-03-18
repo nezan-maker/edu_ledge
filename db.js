@@ -1,5 +1,5 @@
 import * as mariadb from "mariadb";
-const connectDB = async () => {
+export const connectDB = async () => {
   const host = "localhost";
   const user = "e_read";
   const password = "sine";
@@ -16,4 +16,4 @@ const connectDB = async () => {
     console.error(error);
   }
 };
-export default connectDB;
+
