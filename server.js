@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
         let user_email = value.email;
         const hashedPassword = await bcrypt.hash(value.password, 10);
         let password = hashedPassword;
+        
       }
     });
   }
