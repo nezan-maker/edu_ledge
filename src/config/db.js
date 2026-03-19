@@ -39,7 +39,6 @@ export const signupQuery = async (name, email, password) => {
   }
 };
 export const loginQuery = async (email, password) => {
-  let check_emitter;
   try {
     conn = await pool.getConnection();
     let sql = `SELECT password FROM  users WHERE email in  (?)`;

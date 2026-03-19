@@ -33,7 +33,10 @@ export const signup = async (req, res) => {
       }
     } catch (error) {
       console.error(error);
-      res.end();
+      let response_message = { message: "Internal server error" };
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(response_message));
     }
   });
 };
@@ -59,11 +62,15 @@ export const login = async (req, res) => {
         const log_user_in = await loginQuery(user_email, password);
         if (log_user_in) {
           response_message = { message: "Login successfull" };
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(response_message));
         } else {
           response_message = { message: "Invalid credentials" };
+          res.statusCode = 401;
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(response_message));
         }
-        res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(response_message));
       }
     } catch (error) {
       console.error(error);
