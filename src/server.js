@@ -1,7 +1,8 @@
 import http from "http";
-import { connectDB, signupQuery } from "../src/config/db.js";
-import controller from "../src/controllers/userControllers.js";
+import { connectDB } from "./config/db.js";
+import controller from "./controllers/userControllers.js";
 const server = http.createServer((req, res) => {
+  connectDB();
   controller(req, res);
 });
 

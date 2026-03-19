@@ -1,11 +1,14 @@
 import * as mariadb from "mariadb";
+import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 let pool;
 let conn;
+dotenv.config();
 export const connectDB = async () => {
-  const host = "localhost";
-  const user = "e_read";
-  const password = "sine";
-  const database = "e_read";
+  const host = process.env.MARIA_DB_HOST;
+  const user = process.env.MARIA_DB_USER;
+  const password = process.env.MARIA_DB_PASS;
+  const database = process.env.MARIA_DB;
   try {
     pool = mariadb.createPool({
       host,
@@ -29,6 +32,20 @@ export const signupQuery = async (name, email, password) => {
     let sql = `INSERT INTO users(name,email,password) values(?,?,?)`;
     const result = await conn.query(sql, [name, email, password]);
     return result;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const loginQuery = async (email, password) => {
+  let check_emitter;
+  try {
+    conn = await pool.getConnection();
+    let sql = `SELECT password FROM  users WHERE email in  (?)`;
+    const result = await conn.query(sql, [email]);
+    const check = await bcrypt.compare(password, result[0].password);
+    return check;
   } catch (error) {
     console.error(error);
   } finally {
