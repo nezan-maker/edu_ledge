@@ -1,3 +1,4 @@
+import { signupSchema, bookSchema } from "../validations/validate.js";
 const controller = async (req, res) => {
   if (req.url === "/signup" && req.method === "POST") {
     console.log("Request made");
