@@ -1,9 +1,4 @@
-import http from "http";
-import { connectDB, signupQuery } from "./db.js";
-import bcrypt from "bcrypt";
-import { bookSchema, signupSchema } from "./validate.js";
-import Joi from "joi";
-const server = http.createServer((req, res) => {
+const controller = async (req, res) => {
   if (req.url === "/signup" && req.method === "POST") {
     console.log("Request made");
     let body = "";
@@ -35,10 +30,5 @@ const server = http.createServer((req, res) => {
       }
     });
   }
-});
-
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, async () => {
-  await connectDB();
-  console.log(`Server running on port on ${PORT}`);
-});
+};
+export default controller;
