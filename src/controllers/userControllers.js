@@ -34,7 +34,7 @@ export const signup = async (req, res) => {
     } catch (error) {
       console.error(error);
       let response_message = { message: "Internal server error" };
-      res.statusCode = 500;
+      res.statusCode = 500; 
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(response_message));
     }

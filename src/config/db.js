@@ -51,3 +51,24 @@ export const loginQuery = async (email, password) => {
     if (conn) conn.release();
   }
 };
+export const bookQuery = async (name) => {
+  let check;
+  try {
+    const conn = await pool.getConnection();
+    if (pool) {
+      console.log("MARIADB CONNECTED ");
+    }
+    let sql = `SELECT path FROM books where name in (?)`;
+    const result = await conn.query(sql, [name]);
+    if (result.error) {
+      console.error(result.error.details);
+      check = false;
+    } else {
+      return result.value[0].path;
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
