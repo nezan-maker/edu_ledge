@@ -1,6 +1,6 @@
 import http from "http";
 import { connectDB } from "./config/db.js";
-import controller from "./controllers/userControllers.js";
+import controller from "./controllers/router.js";
 const server = http.createServer((req, res) => {
   connectDB();
   controller(req, res);
