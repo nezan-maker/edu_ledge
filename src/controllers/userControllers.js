@@ -1,4 +1,5 @@
 import { signupSchema, bookSchema } from "../validations/validate.js";
+import bcrypt from "bcrypt";
 const controller = async (req, res) => {
   if (req.url === "/signup" && req.method === "POST") {
     console.log("Request made");

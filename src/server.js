@@ -1,7 +1,5 @@
 import http from "http";
 import { connectDB, signupQuery } from "../src/config/db.js";
-import bcrypt from "bcrypt";
-import Joi from "joi";
 import controller from "../src/controllers/userControllers.js";
 const server = http.createServer((req, res) => {
   controller(req, res);
