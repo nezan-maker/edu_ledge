@@ -1,10 +1,7 @@
 import "./App.css";
+import Landing from "./pages/LandingPage";
 
 const App = () => {
-  return (
-    <div className="bg-amber-100 text-3xl">
-      <p>I am happy</p>
-    </div>
-  );
+  return <h1 className="text-2xl font-caladea"></h1>;
 };
 export default App;
