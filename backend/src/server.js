@@ -1,13 +1,21 @@
-import http from "http";
+import express from "express";
+import debug from "debug";
+import createUserRoutes from "./routes/userRoutes.js";
 import { connectDB } from "./config/db.js";
-import controller from "./controllers/router.js";
-const server = http.createServer((req, res) => {
-  connectDB();
-  controller(req, res);
-});
-
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, async () => {
-  await connectDB();
-  console.log(`Server running on port on ${PORT}`);
-});
+const serverDebug = debug("app:server");
+const app = express();
+app.use(express.json());
+app.use("/auth/", createUserRoutes);
+const startServer = async () => {
+  try {
+    const connection = await connectDB();
+    if (connection) {
+      app.listen(5000, () => {
+        serverDebug("Server connected on port 5000");
+      });
+    }
+  } catch (error) {
+    serverDebug(error);
+  }
+};
+startServer();

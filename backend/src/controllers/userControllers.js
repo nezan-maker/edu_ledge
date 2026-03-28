@@ -3,78 +3,50 @@ import {
   bookSchema,
   loginSchema,
 } from "../validations/validate.js";
+import debug from "debug";
 import bcrypt from "bcrypt";
 import { signupQuery, loginQuery } from "../config/db.js";
-export const signup = async (req, res) => {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-  req.on("end", async () => {
-    try {
-      if (!body) {
-        let message = { message: "Error parsing body" };
-        return res.end(JSON.stringify(message));
-      }
-      const request = JSON.parse(body);
-      const result = signupSchema.validate(request);
-      const value = result.value;
-
-      if (value) {
-        let user_name = value.name;
-        let user_email = value.email;
-        const hashedPassword = await bcrypt.hash(value.password, 10);
-        let password = hashedPassword;
-        await signupQuery(user_name, user_email, password);
-        let message = { message: "You signed up successfully" };
-        res.setHeader("Content-Type", "application/json");
-        res.statusCode == 201;
-        res.end(JSON.stringify(message));
-      }
-    } catch (error) {
-      console.error(error);
-      let response_message = { message: "Internal server error" };
-      res.statusCode = 500; 
-      res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify(response_message));
+const controlDebug = debug("app:controller");
+export const signUp = async (req, res) => {
+  try {
+    const result = signupSchema.parse(req.body);
+    console.log(result);
+    if (!result) {
+      return res
+        .status(401)
+        .json({ message: "Password does not match the requirements" });
     }
-  });
+    const name = result.name;
+    const email = result.email;
+    const password = result.password;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const msg = await signupQuery(req, res, name, email, hashedPassword);
+    if (msg)
+      return res.status(401).json({ message: "You signed up successfully " });
+    res.status(201).json({ message: "You already have an account.Log in" });
+  } catch (error) {
+    controlDebug("Error in controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
-export const login = async (req, res) => {
-  let body = "";
-  req.on("data", (chunk) => {
-    body += chunk.toString();
-  });
-  req.on("end", async () => {
-    let response_message;
-    try {
-      if (!body) {
-        let message = { message: "Error parsing body" };
-        return res.end(JSON.stringify(message));
-      }
-      const request = JSON.parse(body);
-      const result = loginSchema.validate(request);
-      const value = result.value;
-
-      if (value) {
-        let user_email = value.email;
-        const password = value.password;
-        const log_user_in = await loginQuery(user_email, password);
-        if (log_user_in) {
-          response_message = { message: "Login successfull" };
-          res.statusCode = 200;
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(response_message));
-        } else {
-          response_message = { message: "Invalid credentials" };
-          res.statusCode = 401;
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(response_message));
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      res.end("Internal server error");
+export const logIn = async (req, res) => {
+  try {
+    const result = loginSchema.parse(req.body);
+    if (!result) {
+      return res
+        .status(401)
+        .json({ message: "Password does not match the requirements" });
     }
-  });
+    const email = result.value.email;
+    const password = result.value.password;
+    const log_user_in = await loginQuery(email, password);
+    if (!log_user_in) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    } else {
+      res.status(200).json({ message: "Login successful" });
+    }
+  } catch (error) {
+    controlDebug("Error in controllers", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };

@@ -1,8 +1,10 @@
 import * as mariadb from "mariadb";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
+import debug from "debug";
 let pool;
 let conn;
+const dbDebug = debug("app:db");
 dotenv.config();
 export const connectDB = async () => {
   const host = process.env.MARIA_DB_HOST;
@@ -18,22 +20,24 @@ export const connectDB = async () => {
       connectionLimit: 5,
     });
     if (pool) {
-      console.log("MARIADB CONNECTED !");
+      dbDebug("MARIADB CONNECTED !");
     }
     return pool;
   } catch (error) {
     console.error(error);
   }
 };
-export const signupQuery = async (name, email, password) => {
+export const signupQuery = async (req, res, name, email, password) => {
   try {
     conn = await pool.getConnection();
-    console.log;
     let sql = `INSERT INTO users(name,email,password) values(?,?,?)`;
     const result = await conn.query(sql, [name, email, password]);
-    return result;
+    let message = 1;
+    return message;
   } catch (error) {
-    console.error(error);
+    // dbDebug(error);
+    let message = false;
+    return message;
   } finally {
     if (conn) conn.release();
   }
@@ -46,7 +50,7 @@ export const loginQuery = async (email, password) => {
     const check = await bcrypt.compare(password, result[0].password);
     return check;
   } catch (error) {
-    console.error(error);
+    dbDebug(error);
   } finally {
     if (conn) conn.release();
   }
@@ -56,18 +60,18 @@ export const bookQuery = async (name) => {
   try {
     const conn = await pool.getConnection();
     if (pool) {
-      console.log("MARIADB CONNECTED ");
+      dbDebug("MARIADB CONNECTED ");
     }
     let sql = `SELECT path FROM books where name in (?)`;
     const result = await conn.query(sql, [name]);
     if (result.error) {
-      console.error(result.error.details);
+      dbDebug(result.error.details);
       check = false;
     } else {
       return result.value[0].path;
     }
   } catch (error) {
-    console.error(error);
+    dbDebug(error);
   } finally {
     if (conn) conn.release();
   }
