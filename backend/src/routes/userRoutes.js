@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"
 import { signUp, logIn } from "../controllers/userControllers.js";
 const createUserRoutes = () => {
 const router = express.Router();

@@ -6,16 +6,11 @@ import {
 import debug from "debug";
 import bcrypt from "bcrypt";
 import { signupQuery, loginQuery } from "../config/db.js";
+import z from "zod";
 const controlDebug = debug("app:controller");
 export const signUp = async (req, res) => {
   try {
     const result = signupSchema.parse(req.body);
-    console.log(result);
-    if (!result) {
-      return res
-        .status(401)
-        .json({ message: "Password does not match the requirements" });
-    }
     const name = result.name;
     const email = result.email;
     const password = result.password;
@@ -23,9 +18,14 @@ export const signUp = async (req, res) => {
     const msg = await signupQuery(req, res, name, email, hashedPassword);
     if (msg)
       return res.status(401).json({ message: "You signed up successfully " });
-    res.status(201).json({ message: "You already have an account.Log in" });
+    res.status(401).json({ message: "You already have an account.Log in" });
   } catch (error) {
     controlDebug("Error in controller", error);
+    if (error instanceof z.ZodError) {
+      return res
+        .status(401)
+        .json({ message: "Password does not meet the requirements" });
+    }
     res.status(500).json({ message: "Internal server error" });
   }
 };

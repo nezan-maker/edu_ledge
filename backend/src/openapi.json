@@ -1,0 +1,117 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "RCA PocketLibrary",
+    "version": "1.0.0",
+    "description": "API structure for the project RCA PocketLibrary that deals with the streamlining of the process of the making access to library books convenient for everyone"
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Sign up API documentation",
+        "description": "Takes the user info name,password,email ",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["name", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfull response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "You have successfully signed up on RCA PocketLibary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "If the user already exists",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "You are already signed up.Log in"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server controllers not functioning properly",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login API documentation",
+        "description": "Takes the user info password and email",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfull response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Login successfull"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Incorrect credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid credentials"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server controllers not functioning properly",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
