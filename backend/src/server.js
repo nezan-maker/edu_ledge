@@ -5,6 +5,8 @@ import { connectDB } from "./config/db.js";
 import { apiReference } from "@scalar/express-api-reference";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
+import createBooksRoutes from "./routes/bookRoutes.js";
+
 const serverDebug = debug("app:server");
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +24,7 @@ app.use(
   }),
 );
 app.use("/auth/", createUserRoutes);
+app.use("/", createBooksRoutes);
 const startServer = async () => {
   try {
     const connection = await connectDB();

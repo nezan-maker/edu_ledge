@@ -2,12 +2,13 @@ import {
   signupSchema,
   bookSchema,
   loginSchema,
-} from "../validations/validate.js";
+} from "../middleware/schemas/schema.js";
 import debug from "debug";
 import bcrypt from "bcrypt";
 import { signupQuery, loginQuery } from "../config/db.js";
 import z from "zod";
 const controlDebug = debug("app:controller");
+const zDebug = debug("app:zod");
 export const signUp = async (req, res) => {
   try {
     const result = signupSchema.parse(req.body);
@@ -22,6 +23,7 @@ export const signUp = async (req, res) => {
   } catch (error) {
     controlDebug("Error in controller", error);
     if (error instanceof z.ZodError) {
+      zDebug("Input requirements not fulfilled");
       return res
         .status(401)
         .json({ message: "Password does not meet the requirements" });

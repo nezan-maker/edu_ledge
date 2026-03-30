@@ -8,7 +8,7 @@
   "paths": {
     "/auth/register": {
       "post": {
-        "summary": "Sign up API documentation",
+        "summary": "Sign up API",
         "description": "Takes the user info name,password,email ",
         "requestBody": {
           "required": true,
@@ -62,7 +62,7 @@
     },
     "/auth/login": {
       "post": {
-        "summary": "Login API documentation",
+        "summary": "Login API",
         "description": "Takes the user info password and email",
         "requestBody": {
           "required": true,
