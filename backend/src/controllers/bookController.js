@@ -17,7 +17,7 @@ export const registerBook = async (req, res) => {
     const uniqueN = crypto.randomInt(100000);
     const stream = cloudinary.uploader.upload_stream(
       {
-        public_id: "File" + uniqueN + req.file.name,
+        public_id: "File" + uniqueN,
         folder: "library-books",
       },
       (error, result) => {
@@ -26,6 +26,7 @@ export const registerBook = async (req, res) => {
           return res.json({ message: "No file uploaded" });
         }
         res.json({ url: result.secure_url });
+        
       },
     );
     stream.end(req.file.buffer);

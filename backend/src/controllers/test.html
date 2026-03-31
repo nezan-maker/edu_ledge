@@ -44,6 +44,7 @@
           if (response.ok) {
             status.innerText = "Upload Successful!";
             resultDiv.innerHTML = `<img src="${data.url}" width="300">`;
+            console.log(data.url);
           } else {
             console.log(data.error);
             status.innerText =

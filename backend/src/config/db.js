@@ -172,3 +172,38 @@ export const bookQuery = async () => {
     if (conn) conn.release();
   }
 };
+export const saveBookQuery = async (
+  name,
+  author,
+  description,
+  genre,
+  public_id,
+  book_url,
+  category,
+  registered_at,
+) => {
+  let message = false;
+  try {
+    conn = await pool.getConnection();
+    let sql = `INSERT INTO users(name,author,description,genre,public_id,book_url,category,registered_at) values(?,?,?)`;
+    const okPacket = await conn.query(sql, [
+      name,
+      author,
+      description,
+      genre,
+      public_id,
+      book_url,
+      category,
+      registered_at,
+    ]);
+    let user_id = Number(okPacket.insertId);
+    let sql2 = ` SELECT * FROM users where user_id in (?)`;
+    const rows = await conn.query(sql2, [user_id]);
+    return rows[0];
+  } catch (error) {
+    dbDebug(error);
+    return message;
+  } finally {
+    if (conn) conn.release();
+  }
+};
