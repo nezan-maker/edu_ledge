@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <h2>Upload Avatar (AJAX)</h2>
+
+    <form id="uploadForm">
+      <input type="file" id="fileInput" name="uploaded_book" />
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="status"></div>
+    <div id="result"></div>
+
+    <script>
+      const form = document.getElementById("uploadForm");
+      const status = document.getElementById("status");
+      const resultDiv = document.getElementById("result");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Stop the page from refreshing
+
+        const fileInput = document.getElementById("fileInput");
+        if (fileInput.files.length === 0) return alert("Select a file first");
+
+        // 1. Prepare FormData
+        const formData = new FormData();
+
+        // 'avatar' must match your upload.single('avatar') on the server
+        formData.append("uploaded_book", fileInput.files[0]);
+        console.log(formData);
+
+        status.innerText = "Uploading...";
+
+        try {
+          // 2. Send the Fetch request
+          const response = await fetch("http://localhost:5000/register-book", {
+            method: "POST",
+            body: formData, // Fetch automatically sets Content-Type to multipart/form-data
+          });
+
+          const data = await response.json();
+
+          // 3. Handle the response
+          if (response.ok) {
+            status.innerText = "Upload Successful!";
+            resultDiv.innerHTML = `<img src="${data.url}" width="300">`;
+          } else {
+            console.log(data.error);
+            status.innerText =
+              "Upload Failed: " + (data.error || "Unknown error");
+          }
+        } catch (err) {
+          status.innerText = "Network Error: " + err.message;
+        }
+      });
+    </script>
+  </body>
+</html>

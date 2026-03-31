@@ -97,6 +97,4 @@ export const logOut = async (req, res) => {
   res.clearCookie("accesToken");
   if (log_user_out) res.status(200).json({ message: "Log out successful" });
 };
-export const set_password_change = async (req, res) => {};
-export const verify_code = async (req, res) => {};
-export const change_password = async (req, res) => {};
+

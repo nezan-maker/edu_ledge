@@ -6,13 +6,19 @@ import { apiReference } from "@scalar/express-api-reference";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import createBooksRoutes from "./routes/bookRoutes.js";
-
+import cors from "cors";
 const serverDebug = debug("app:server");
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const swagger_path = __dirname + "/openapi.json";
 console.log(swagger_path);
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
+  }),
+);
+
 app.use(express.json());
 app.get("/openapi.json", (req, res) => {
   res.sendFile(path.join(__dirname, "openapi.json"));
@@ -20,7 +26,7 @@ app.get("/openapi.json", (req, res) => {
 app.use(
   "/docs",
   apiReference({
-    url: "/openapi.json", // points to the OpenAPI spec
+    url: "/openapi.json",
   }),
 );
 app.use("/auth/", createUserRoutes);
