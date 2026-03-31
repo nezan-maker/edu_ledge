@@ -17,7 +17,7 @@ export const connectDB = async () => {
       user,
       password,
       database,
-      connectionLimit: 5,
+      connectionLimit: 200,
     });
     if (pool) {
       dbDebug("MARIADB CONNECTED !");
@@ -28,27 +28,123 @@ export const connectDB = async () => {
   }
 };
 export const signupQuery = async (req, res, name, email, password) => {
+  let message = false;
   try {
     conn = await pool.getConnection();
     let sql = `INSERT INTO users(name,email,password) values(?,?,?)`;
-    const result = await conn.query(sql, [name, email, password]);
-    let message = 1;
-    return message;
+    const okPacket = await conn.query(sql, [name, email, password]);
+    let user_id = Number(okPacket.insertId);
+    let sql2 = ` SELECT * FROM users where user_id in (?)`;
+    const rows = await conn.query(sql2, [user_id]);
+    return rows[0];
   } catch (error) {
-    // dbDebug(error);
-    let message = false;
+    dbDebug(error);
     return message;
   } finally {
     if (conn) conn.release();
   }
 };
-export const loginQuery = async (email, password) => {
+export const getIdQuery = async (email) => {
   try {
     conn = await pool.getConnection();
-    let sql = `SELECT password FROM  users WHERE email in  (?)`;
+    let sql = `SELECT user_id FROM users where email in (?)`;
     const result = await conn.query(sql, [email]);
-    const check = await bcrypt.compare(password, result[0].password);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const setEmail = async (id, token) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `UPDATE users SET up_token=${token} where id in (?)`;
+    const result = await conn.query(sql, [id]);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const verifyEmail = async (id) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `SELECT * FROM users WHERE pass_token in (?)`;
+    const result = await conn.query(sql, [id]);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+export const loginQuery = async (email, password, token) => {
+  try {
+    let check = false;
+    conn = await pool.getConnection();
+    let sql = `SELECT  password  FROM users WHERE email in  (?)`;
+
+    const result = await conn.query(sql, [email]);
+    console.log(result);
+    check = await bcrypt.compare(password, result[0].password);
+    if (check) {
+      let sql2 = `UPDATE users SET refresh_token= ? WHERE email = ?`;
+      const set_token_result = await conn.query(sql2, [token, email]);
+      console.log(set_token_result);
+      if (set_token_result) check = true;
+    }
     return check;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const logoutQuery = async (id) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `UPDATE users SET refresh_token=NULL where user_id in (?)`;
+    const result = await conn.query(sql, [id]);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const resetCodeQuery = async (id, token) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `UPDATE users SET pass_token=${token} WHERE user_id in (?) `;
+    const result = await conn.query(sql, token, [id]);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const verifyQuery = async (id) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `SELECT pass_token from users WHERE user_id in (?)`;
+    const result = await conn.query(sql, [id]);
+    return result;
+  } catch (error) {
+    dbDebug(error);
+  } finally {
+    if (conn) conn.release();
+  }
+};
+export const setPassword = async (id, newPass) => {
+  try {
+    conn = await pool.getConnection();
+    let sql = `UPDATE users SET password=${newPass} where user_id in (?)`;
+    const result = await conn.query(sql, [id]);
+    return result;
   } catch (error) {
     dbDebug(error);
   } finally {
@@ -58,7 +154,7 @@ export const loginQuery = async (email, password) => {
 export const bookQuery = async () => {
   let check;
   try {
-    const conn = await pool.getConnection();
+    conn = await pool.getConnection();
     if (pool) {
       dbDebug("MARIADB CONNECTED ");
     }
